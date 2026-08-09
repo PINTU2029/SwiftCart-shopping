@@ -256,7 +256,7 @@ const HomePage = () => {
                   className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
                 >
                   {/* BIGGER CIRCULAR IMAGE CONTAINER FOR EXACT 5 ITEMS PER SCREEN (w-32 h-32 to w-44 h-44) */}
-                  <div className="relative w-40 h-40 sm:w-40 sm:h-50 lg:w-44 lg:h-50">
+                  <div className="relative w-42 h-42 sm:w-40 sm:h-55 lg:w-55 lg:h-50">
                     <img 
                       src={item.image || item.images?.[0]} 
                       alt={item.name || item.title} 
@@ -272,7 +272,7 @@ const HomePage = () => {
                   </div>
 
                   {/* Title & Pricing */}
-                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-50 text-center group-hover/circle:text-indigo-600 transition">
+                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-53 text-center group-hover/circle:text-indigo-600 transition">
                     {item.name || item.title}
                   </p>
                   
