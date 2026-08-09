@@ -224,7 +224,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. CIRCLE SLIDER (Guaranteed Offer & Savings Display) */}
+      {/* 4. CIRCLE SLIDER (Pure Raw Database Mapping - Zero Auto Price Modifications) */}
       {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto py-6 relative group">
           
@@ -239,33 +239,19 @@ const HomePage = () => {
           {/* Scrollable Container */}
           <div 
             ref={sliderRef}
-            className="flex items-center justify-between gap-6 sm:gap-8 overflow-x-auto scroll-smooth py-4 px-2"
+            className="flex items-center justify-between gap-6 sm:gap-8 overflow-x-auto scroll毛-smooth py-4 px-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {carouselProducts.map((item) => {
               const title = item.title || item.name;
               const image = item.image || (item.images && item.images[0]);
               
-              // 🔴 Offer & Pricing Calculations:
-              let mrpVal = Number(item.mrp || item.originalPrice);
-              let offerPriceVal = Number(item.discountPrice || item.sellingPrice);
-
-              // Agar offerPriceVal missing hai but price variable me MRP hai (jaise Saree ₹19990):
-              if (!offerPriceVal) {
-                if (mrpVal && item.price && item.price < mrpVal) {
-                  offerPriceVal = Number(item.price);
-                } else if (item.price) {
-                  // Standard Offer Calculation: Price par ~45% OFF de kar Offer Price banana
-                  mrpVal = Number(item.price);
-                  offerPriceVal = Math.round(mrpVal * 0.55);
-                }
-              }
-
-              if (!mrpVal && offerPriceVal) {
-                mrpVal = Math.round(offerPriceVal * 1.45);
-              }
-
-              const savings = mrpVal > offerPriceVal ? (mrpVal - offerPriceVal) : 0;
+              // 🔴 STRICT DATA MAPPING: Exactly Product Card jaise properties consume kar rahe hain
+              const price = item.price;
+              const mrp = item.mrp || item.originalPrice;
+              
+              // Direct subtraction using database saved fields
+              const savings = (mrp && Number(mrp) > Number(price)) ? (Number(mrp) - Number(price)) : 0;
 
               return (
                 <Link 
@@ -273,7 +259,7 @@ const HomePage = () => {
                   to={`/product/${item._id}`} 
                   className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
                 >
-                  {/* PERFECT CIRCULAR IMAGE */}
+                  {/* PERFECT CIRCULAR IMAGE CONTAINER */}
                   <div className="relative w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 aspect-square rounded-full overflow-hidden shadow-md group-hover/circle:scale-105 transition duration-300 bg-slate-50 border border-slate-100">
                     <img 
                       src={image} 
@@ -281,7 +267,7 @@ const HomePage = () => {
                       className="w-full h-full object-cover rounded-full"
                     />
 
-                    {/* 🏷️ Save ₹X Badge (Green Offer Badge inside circle) */}
+                    {/* 🏷️ Save ₹X Badge (Sirf tabhi dikhega jab database me real MRP > Price ho) */}
                     {savings > 0 && (
                       <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-bold px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
                         Save ₹{savings}
@@ -294,17 +280,14 @@ const HomePage = () => {
                     {title}
                   </p>
                   
-                  {/* Selling Price & Strikethrough MRP */}
+                  {/* Price & MRP Display (Original DB values directly mapped) */}
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    {/* Offer Discount Price */}
                     <span className="text-xs sm:text-sm font-extrabold text-slate-900">
-                      ₹{offerPriceVal}
+                      ₹{price}
                     </span>
-
-                    {/* Strikethrough Original MRP */}
-                    {mrpVal > offerPriceVal && (
+                    {mrp && Number(mrp) > Number(price) && (
                       <span className="text-[11px] text-slate-400 line-through font-medium">
-                        ₹{mrpVal}
+                        ₹{mrp}
                       </span>
                     )}
                   </div>
