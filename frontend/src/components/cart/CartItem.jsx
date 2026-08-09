@@ -5,13 +5,15 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
   if (!product) return null;
 
-  // Image Fallback Handling (Single 'image' or 'images' array)
+  // Image Fallback Handling
   const productImage = product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/100';
 
-  // MRP & Offer Calculation
-  const mrp = product.mrp || product.originalPrice || Math.round(product.price * 1.25);
-  const savings = mrp > product.price ? (mrp - product.price) : 0;
-  const discountPercent = mrp > product.price ? Math.round(((mrp - product.price) / mrp) * 100) : 0;
+  // 🔴 FIX: Agar product.mrp hai toh wo use karo, warna actual selling price ko prioritise karo
+  const sellingPrice = Number(product.price) || 0;
+  const mrp = Number(product.mrp || product.originalPrice) || Math.round(sellingPrice * 1.25);
+  
+  const savings = mrp > sellingPrice ? (mrp - sellingPrice) : 0;
+  const discountPercent = mrp > sellingPrice ? Math.round(((mrp - sellingPrice) / mrp) * 100) : 0;
 
   return (
     <div className="flex items-center justify-between border-b border-slate-200 py-4 gap-4">
@@ -32,11 +34,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           <div className="flex items-center gap-2 flex-wrap">
             {/* Selling Price */}
             <span className="text-slate-900 font-bold text-base">
-              ₹{product.price}
+              ₹{sellingPrice}
             </span>
 
             {/* MRP Strikethrough Price */}
-            {mrp > product.price && (
+            {mrp > sellingPrice && (
               <span className="text-xs text-slate-400 line-through font-medium">
                 ₹{mrp}
               </span>
@@ -57,14 +59,14 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         <div className="flex items-center border border-slate-300 rounded-lg overflow-hidden">
           <button
             onClick={() => onUpdateQuantity(product._id, Math.max(1, quantity - 1))}
-            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
+            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
           >
             -
           </button>
           <span className="px-3 py-1 text-sm font-semibold text-slate-800">{quantity}</span>
           <button
             onClick={() => onUpdateQuantity(product._id, quantity + 1)}
-            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold"
+            className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer"
           >
             +
           </button>
@@ -73,7 +75,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         {/* Total Price for Item Quantity */}
         <div className="text-right hidden sm:block w-24">
           <span className="font-bold text-slate-900 block">
-            ₹{product.price * quantity}
+            ₹{sellingPrice * quantity}
           </span>
           {savings > 0 && (
             <span className="text-[10px] text-emerald-600 font-semibold block">
@@ -85,7 +87,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         {/* Delete Button */}
         <button
           onClick={() => onRemove(product._id)}
-          className="text-red-500 hover:text-red-700 text-sm font-semibold p-1"
+          className="text-red-500 hover:text-red-700 text-sm font-semibold p-1 cursor-pointer"
           title="Remove Item"
         >
           🗑️
