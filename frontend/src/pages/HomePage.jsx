@@ -20,10 +20,10 @@ const DEFAULT_CATEGORIES = [
 
 // Default Fallback Banners
 const DEFAULT_BANNERS = [
-  "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=1400&h=300&auto=format&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1400&h=300&auto=format&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1556911261-6bd341186b2f?q=80&w=1400&h=300&auto=format&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1400&h=300&auto=format&fit=crop&crop=center"
+  "https://m.media-amazon.com/images/G/31/img22/Electronics/Clearance/A6_1500x300.jpg",
+  "https://m.media-amazon.com/images/G/31/img23/Beauty/GW/Jan/Unrec/Makeup_1500x300.jpg",
+  "https://m.media-amazon.com/images/G/31/img21/Appliances/GW/Unrec/LargeApp_1500x300.jpg",
+  "https://m.media-amazon.com/images/G/31/img23/Fashion/GW/MFD/Nov/Deals-1500x300.jpg"
 ];
 
 const HomePage = () => {
