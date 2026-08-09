@@ -96,7 +96,7 @@ const HomePage = () => {
     }
   };
 
-  // Fetch Products & Prepare Carousel Data
+  // Fetch Products & Prepare Different Products for Carousel
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -112,10 +112,11 @@ const HomePage = () => {
         const { data } = await API.get(url);
         setProducts(data);
 
-        // Shuffle Array to pick different products for Carousel
+        // Grid ke products se DFFERENT products slider me laane ke liye
         if (data && data.length > 0) {
-          const shuffled = [...data].sort(() => 0.5 - Math.random());
-          setCarouselProducts(shuffled);
+          // Slice or Reverse to select different set of products
+          const differentProducts = [...data].reverse();
+          setCarouselProducts(differentProducts);
         }
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -225,62 +226,44 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. CIRCULAR PRODUCT SLIDER CAROUSEL (Grid aur Bottom ke Beech) */}
+      {/* 4. CLEAN CIRCULAR SLIDER (Bina kisi border/card outline ke - Only Round Image) */}
       {!loading && carouselProducts.length > 0 && (
-        <div className="w-[90%] mx-auto bg-white p-6 rounded-2xl shadow-md border border-slate-200 relative group">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 tracking-wide">
-                Best Deals & Top Picks
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">Explore deals uploaded from admin store</p>
-            </div>
-            <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-              Swipe to view ➔
-            </span>
-          </div>
-
+        <div className="w-[90%] mx-auto py-4 relative group">
+          
           {/* Left Arrow Button */}
           <button 
             onClick={() => handleScroll(-300)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-900 w-9 h-9 rounded-full shadow-md flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-slate-200"
           >
             ❮
           </button>
 
-          {/* Scrollable Circular Items Container */}
+          {/* Scrollable Pure Circular Products Container */}
           <div 
             ref={sliderRef}
-            className="flex items-center gap-6 overflow-x-auto scroll-smooth py-2 px-2"
+            className="flex items-center gap-6 sm:gap-8 overflow-x-auto scroll-smooth py-2 px-4"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {carouselProducts.map((item) => (
               <Link 
                 key={item._id} 
                 to={`/product/${item._id}`} 
-                className="min-w-[150px] max-w-[150px] flex flex-col items-center group/circle cursor-pointer"
+                className="flex flex-col items-center shrink-0 group/circle cursor-pointer"
               >
-                {/* 🔴 CIRCULAR IMAGE CONTAINER */}
-                <div className="w-32 h-32 rounded-full p-1.5 border-2 border-indigo-100 group-hover/circle:border-indigo-600 bg-white shadow-sm group-hover/circle:shadow-md group-hover/circle:scale-105 transition-all duration-300 flex items-center justify-center overflow-hidden">
-                  <img 
-                    src={item.image || item.images?.[0]} 
-                    alt={item.name || item.title} 
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                </div>
+                {/* 🔴 ONLY CIRCULAR IMAGE (Bina outer border / background border ke) */}
+                <img 
+                  src={item.image || item.images?.[0]} 
+                  alt={item.name || item.title} 
+                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-cover rounded-full group-hover/circle:scale-105 transition duration-300 shadow-sm"
+                />
 
-                {/* Product Name & Offer Text */}
-                <div className="mt-3 text-center w-full">
-                  <p className="text-xs font-bold text-slate-800 truncate px-1 group-hover/circle:text-indigo-600 transition">
-                    {item.name || item.title}
-                  </p>
-                  <p className="text-xs font-extrabold text-indigo-600 mt-1">
-                    ₹{item.price}
-                  </p>
-                  <span className="inline-block mt-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    Order Now
-                  </span>
-                </div>
+                {/* Title & Price */}
+                <p className="mt-2 text-xs font-semibold text-slate-700 truncate max-w-[100px] text-center group-hover/circle:text-indigo-600 transition">
+                  {item.name || item.title}
+                </p>
+                <p className="text-xs font-bold text-slate-900 mt-0.5">
+                  ₹{item.price}
+                </p>
               </Link>
             ))}
           </div>
@@ -288,7 +271,7 @@ const HomePage = () => {
           {/* Right Arrow Button */}
           <button 
             onClick={() => handleScroll(300)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-900 w-9 h-9 rounded-full shadow-md flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-slate-200"
           >
             ❯
           </button>
