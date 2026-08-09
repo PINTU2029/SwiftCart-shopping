@@ -21,13 +21,29 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [loading, setLoading] = useState(false);
 
-  const itemsPrice = cartItems.reduce(
-    (acc, item) => acc + (item.product ? item.product.price * item.quantity : 0),
-    0
-  );
-  const shippingPrice = itemsPrice > 500 || itemsPrice === 0 ? 0 : 50;
-  const taxPrice = Math.round(itemsPrice * 0.18);
-  const totalPrice = itemsPrice + shippingPrice + taxPrice;
+  // 🔴 ProductCard Matching Exact Logic for Checkout Totals
+  let mrpSubtotal = 0;
+  let finalItemsPrice = 0;
+
+  cartItems.forEach((item) => {
+    if (item.product) {
+      const p = item.product;
+      const originalPrice = Number(p.price) || 0;
+      const discountPercent = Number(p.discount) || 20;
+
+      const discountedPrice = discountPercent > 0
+        ? Math.round(originalPrice - (originalPrice * discountPercent) / 100)
+        : originalPrice;
+
+      mrpSubtotal += originalPrice * (item.quantity || 1);
+      finalItemsPrice += discountedPrice * (item.quantity || 1);
+    }
+  });
+
+  const totalDiscount = mrpSubtotal - finalItemsPrice;
+  const shippingPrice = finalItemsPrice > 500 || finalItemsPrice === 0 ? 0 : 50;
+  const taxPrice = Math.round(finalItemsPrice * 0.18);
+  const totalPrice = finalItemsPrice + shippingPrice + taxPrice;
 
   // Razorpay Checkout JS Script Loader
   const loadRazorpayScript = () => {
@@ -56,16 +72,24 @@ const CheckoutPage = () => {
 
     try {
       const orderData = {
-        orderItems: cartItems.map((item) => ({
-          title: item.product.title,
-          quantity: item.quantity,
-          image: item.product.images?.[0] || '',
-          price: item.product.price,
-          product: item.product._id,
-        })),
+        orderItems: cartItems.map((item) => {
+          const originalPrice = Number(item.product.price) || 0;
+          const discountPercent = Number(item.product.discount) || 20;
+          const discountedPrice = discountPercent > 0
+            ? Math.round(originalPrice - (originalPrice * discountPercent) / 100)
+            : originalPrice;
+
+          return {
+            title: item.product.title || item.product.name,
+            quantity: item.quantity,
+            image: item.product.images?.[0] || item.product.image || '',
+            price: discountedPrice,
+            product: item.product._id,
+          };
+        }),
         shippingAddress: address,
         paymentMethod,
-        itemsPrice,
+        itemsPrice: finalItemsPrice,
         taxPrice,
         shippingPrice,
         totalPrice,
@@ -240,29 +264,52 @@ const CheckoutPage = () => {
             </div>
           </div>
 
+          {/* 🏷️ Payment Summary Card */}
           <div className="bg-slate-900 text-white p-6 rounded-2xl space-y-3 shadow-lg">
-            <h3 className="font-bold text-lg border-b border-slate-800 pb-2">Payment Summary</h3>
+            <h3 className="font-bold text-lg border-b border-slate-800 pb-2 text-slate-100">Payment Summary</h3>
+            
+            {/* 1. MRP Subtotal */}
             <div className="flex justify-between text-sm text-slate-300">
-              <span>Items Subtotal</span>
-              <span>₹{itemsPrice}</span>
+              <span>Items Subtotal (MRP)</span>
+              <span className="line-through text-slate-400 font-medium">₹{mrpSubtotal}</span>
             </div>
+
+            {/* 2. Offer Discount Row */}
+            {totalDiscount > 0 && (
+              <div className="flex justify-between text-sm text-emerald-400 font-bold bg-emerald-950/50 px-2.5 py-1 rounded-lg border border-emerald-800/40">
+                <span>Offer Discount</span>
+                <span>- ₹{totalDiscount}</span>
+              </div>
+            )}
+
+            {/* 3. Price After Offer */}
+            <div className="flex justify-between text-sm text-slate-300">
+              <span>Price After Offer</span>
+              <span className="font-bold text-slate-100">₹{finalItemsPrice}</span>
+            </div>
+
+            {/* 4. GST */}
             <div className="flex justify-between text-sm text-slate-300">
               <span>GST (18%)</span>
               <span>₹{taxPrice}</span>
             </div>
+
+            {/* 5. Shipping */}
             <div className="flex justify-between text-sm text-slate-300">
               <span>Shipping</span>
               <span>{shippingPrice === 0 ? <span className="text-emerald-400 font-bold">FREE</span> : `₹${shippingPrice}`}</span>
             </div>
+
+            {/* Total Amount */}
             <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-slate-800">
               <span>Total Amount</span>
-              <span className="text-indigo-400">₹{totalPrice}</span>
+              <span className="text-indigo-400 text-xl font-extrabold">₹{totalPrice}</span>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-4 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-500 transition shadow-lg disabled:bg-indigo-400"
+              className="w-full mt-4 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-500 transition shadow-lg disabled:bg-indigo-400 cursor-pointer"
             >
               {loading ? 'Processing...' : 'Confirm & Place Order'}
             </button>
