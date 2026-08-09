@@ -256,7 +256,7 @@ const HomePage = () => {
                   className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
                 >
                   {/* BIGGER CIRCULAR IMAGE CONTAINER (w-28 h-28 sm:w-36 sm:h-36) */}
-                  <div className="relative w-38 h-38 sm:w-46 sm:h-36">
+                  <div className="relative w-28 h-28 sm:w-36 sm:h-46">
                     <img 
                       src={item.image || item.images?.[0]} 
                       alt={item.name || item.title} 
