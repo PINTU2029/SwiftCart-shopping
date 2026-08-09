@@ -6,14 +6,18 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
   if (!product) return null;
 
   // Image Fallback Handling
-  const productImage = product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/100';
+  const productImage = (product.images && product.images[0]) || product.image || 'https://via.placeholder.com/100';
 
-  // 🔴 FIX: Agar product.mrp hai toh wo use karo, warna actual selling price ko prioritise karo
-  const sellingPrice = Number(product.price) || 0;
-  const mrp = Number(product.mrp || product.originalPrice) || Math.round(sellingPrice * 1.25);
-  
-  const savings = mrp > sellingPrice ? (mrp - sellingPrice) : 0;
-  const discountPercent = mrp > sellingPrice ? Math.round(((mrp - sellingPrice) / mrp) * 100) : 0;
+  // 🔴 ProductCard Wala Exact Logic
+  const discountPercent = Number(product.discount) || 20; 
+  const originalPrice = Number(product.price) || 0;
+
+  const discountedPrice = discountPercent > 0
+    ? Math.round(originalPrice - (originalPrice * discountPercent) / 100)
+    : originalPrice;
+
+  const itemSavings = (originalPrice - discountedPrice) * quantity;
+  const itemTotalDiscounted = discountedPrice * quantity;
 
   return (
     <div className="flex items-center justify-between border-b border-slate-200 py-4 gap-4">
@@ -32,20 +36,20 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
           {/* 🏷️ OFFER PRICE BREAKDOWN */}
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Selling Price */}
+            {/* Real Selling Price */}
             <span className="text-slate-900 font-bold text-base">
-              ₹{sellingPrice}
+              ₹{discountedPrice}
             </span>
 
-            {/* MRP Strikethrough Price */}
-            {mrp > sellingPrice && (
+            {/* Original MRP Strikethrough Price */}
+            {discountPercent > 0 && (
               <span className="text-xs text-slate-400 line-through font-medium">
-                ₹{mrp}
+                ₹{originalPrice}
               </span>
             )}
 
             {/* Green Discount Offer Badge */}
-            {savings > 0 && (
+            {discountPercent > 0 && (
               <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 {discountPercent}% OFF
               </span>
@@ -73,13 +77,13 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
         </div>
 
         {/* Total Price for Item Quantity */}
-        <div className="text-right hidden sm:block w-24">
+        <div className="text-right hidden sm:block w-28">
           <span className="font-bold text-slate-900 block">
-            ₹{sellingPrice * quantity}
+            ₹{itemTotalDiscounted}
           </span>
-          {savings > 0 && (
+          {itemSavings > 0 && (
             <span className="text-[10px] text-emerald-600 font-semibold block">
-              Save ₹{savings * quantity}
+              Save ₹{itemSavings}
             </span>
           )}
         </div>

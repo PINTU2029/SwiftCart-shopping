@@ -279,7 +279,7 @@ const HomePage = () => {
                   </div>
 
                   {/* Title */}
-                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-[170px] text-center group-hover/circle:text-indigo-600 transition">
+                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-43 text-center group-hover/circle:text-indigo-600 transition">
                     {title}
                   </p>
                   

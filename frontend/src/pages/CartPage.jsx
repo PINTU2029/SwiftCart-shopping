@@ -13,25 +13,26 @@ const CartPage = () => {
     fetchCart();
   }, []);
 
-  // 1. MRP Total (Bina Discount ka Total Price)
-  const mrpSubtotal = cartItems.reduce((acc, item) => {
-    if (!item.product) return acc;
-    const p = item.product;
-    const mrp = p.mrp || p.originalPrice || Math.round(p.price * 1.25);
-    return acc + mrp * item.quantity;
-  }, 0);
+  // 🔴 ProductCard matching calculation logic for totals
+  let mrpSubtotal = 0;
+  let finalSubtotal = 0;
 
-  // 2. Total Offer Discount (Bachat)
-  const totalDiscount = cartItems.reduce((acc, item) => {
-    if (!item.product) return acc;
-    const p = item.product;
-    const mrp = p.mrp || p.originalPrice || Math.round(p.price * 1.25);
-    const savings = mrp > p.price ? (mrp - p.price) * item.quantity : 0;
-    return acc + savings;
-  }, 0);
+  cartItems.forEach((item) => {
+    if (item.product) {
+      const p = item.product;
+      const originalPrice = Number(p.price) || 0;
+      const discountPercent = Number(p.discount) || 20;
 
-  // 3. Final Selling Subtotal (MRP - Discount)
-  const finalSubtotal = mrpSubtotal - totalDiscount;
+      const discountedPrice = discountPercent > 0
+        ? Math.round(originalPrice - (originalPrice * discountPercent) / 100)
+        : originalPrice;
+
+      mrpSubtotal += originalPrice * item.quantity;
+      finalSubtotal += discountedPrice * item.quantity;
+    }
+  });
+
+  const totalDiscount = mrpSubtotal - finalSubtotal;
 
   if (loading) return <Loader />;
 
@@ -59,7 +60,6 @@ const CartPage = () => {
             ))}
           </div>
           <div>
-            {/* Extended Props Pass Kiye Gaye Hain */}
             <CartSummary 
               mrpSubtotal={mrpSubtotal}
               totalDiscount={totalDiscount}

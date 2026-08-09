@@ -63,7 +63,7 @@ const CartSummary = ({ mrpSubtotal, totalDiscount, subtotal, onCheckout }) => {
       <button
         onClick={onCheckout}
         disabled={subtotal === 0}
-        className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md mt-2"
+        className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md mt-2 cursor-pointer"
       >
         Proceed to Checkout
       </button>
