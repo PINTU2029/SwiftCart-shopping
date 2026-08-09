@@ -224,7 +224,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. CIRCLE SLIDER (Pure Raw Database Mapping - Zero Auto Price Modifications) */}
+      {/* 4. CIRCLE SLIDER (Exact Match with ProductCard Logic) */}
       {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto py-6 relative group">
           
@@ -239,27 +239,30 @@ const HomePage = () => {
           {/* Scrollable Container */}
           <div 
             ref={sliderRef}
-            className="flex items-center justify-between gap-6 sm:gap-8 overflow-x-auto scroll毛-smooth py-4 px-2"
+            className="flex items-center justify-between gap-6 sm:gap-8 overflow-x-auto scroll-smooth py-4 px-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {carouselProducts.map((item) => {
-              const title = item.title || item.name;
-              const image = item.image || (item.images && item.images[0]);
-              
-              // 🔴 STRICT DATA MAPPING: Exactly Product Card jaise properties consume kar rahe hain
-              const price = item.price;
-              const mrp = item.mrp || item.originalPrice;
-              
-              // Direct subtraction using database saved fields
-              const savings = (mrp && Number(mrp) > Number(price)) ? (Number(mrp) - Number(price)) : 0;
+            {carouselProducts.map((product) => {
+              const title = product.title || product.name;
+              const image = product.images && product.images[0] ? product.images[0] : (product.image || 'https://via.placeholder.com/300');
+
+              // 🔴 EXACT PRODUCT CARD CALCULATION LOGIC:
+              const discountPercent = Number(product.discount) || 20; 
+              const originalPrice = Number(product.price) || 0;
+
+              const discountedPrice = discountPercent > 0
+                ? Math.round(originalPrice - (originalPrice * discountPercent) / 100)
+                : originalPrice;
+
+              const savedAmount = originalPrice - discountedPrice;
 
               return (
                 <Link 
-                  key={item._id} 
-                  to={`/product/${item._id}`} 
+                  key={product._id} 
+                  to={`/product/${product._id}`} 
                   className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
                 >
-                  {/* PERFECT CIRCULAR IMAGE CONTAINER */}
+                  {/* PERFECT CIRCULAR IMAGE */}
                   <div className="relative w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 aspect-square rounded-full overflow-hidden shadow-md group-hover/circle:scale-105 transition duration-300 bg-slate-50 border border-slate-100">
                     <img 
                       src={image} 
@@ -267,10 +270,10 @@ const HomePage = () => {
                       className="w-full h-full object-cover rounded-full"
                     />
 
-                    {/* 🏷️ Save ₹X Badge (Sirf tabhi dikhega jab database me real MRP > Price ho) */}
-                    {savings > 0 && (
+                    {/* 🏷️ Save ₹X Badge (Green Offer Badge inside circle) */}
+                    {discountPercent > 0 && savedAmount > 0 && (
                       <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-bold px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
-                        Save ₹{savings}
+                        Save ₹{savedAmount}
                       </span>
                     )}
                   </div>
@@ -280,14 +283,17 @@ const HomePage = () => {
                     {title}
                   </p>
                   
-                  {/* Price & MRP Display (Original DB values directly mapped) */}
+                  {/* Price & Strikethrough Original MRP (100% Identical to ProductCard) */}
                   <div className="flex items-center gap-1.5 mt-0.5">
+                    {/* Discounted Selling Price */}
                     <span className="text-xs sm:text-sm font-extrabold text-slate-900">
-                      ₹{price}
+                      ₹{discountedPrice}
                     </span>
-                    {mrp && Number(mrp) > Number(price) && (
+
+                    {/* Strikethrough Original MRP */}
+                    {discountPercent > 0 && (
                       <span className="text-[11px] text-slate-400 line-through font-medium">
-                        ₹{mrp}
+                        ₹{originalPrice}
                       </span>
                     )}
                   </div>
