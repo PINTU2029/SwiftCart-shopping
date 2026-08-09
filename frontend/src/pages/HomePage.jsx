@@ -20,10 +20,10 @@ const DEFAULT_CATEGORIES = [
 
 // Default Fallback Banners
 const DEFAULT_BANNERS = [
-  "https://m.media-amazon.com/images/G/31/img22/Electronics/Clearance/A6_1500x300.jpg",
-  "https://m.media-amazon.com/images/G/31/img23/Beauty/GW/Jan/Unrec/Makeup_1500x300.jpg",
-  "https://m.media-amazon.com/images/G/31/img21/Appliances/GW/Unrec/LargeApp_1500x300.jpg",
-  "https://m.media-amazon.com/images/G/31/img23/Fashion/GW/MFD/Nov/Deals-1500x300.jpg"
+  "https://images.pexels.com/photos/2533266/pexels-photo-2533266.jpeg?auto=compress&cs=tinysrgb&w=1500&h=350&fit=crop",
+  "https://images.pexels.com/photos/1080721/pexels-photo-1080721.jpeg?auto=compress&cs=tinysrgb&w=1500&h=350&fit=crop",
+  "https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&w=1500&h=350&fit=crop",
+  "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=1500&h=350&fit=crop"
 ];
 
 const HomePage = () => {
@@ -162,10 +162,10 @@ const HomePage = () => {
         >
           {bannerImages.map((imgUrl, index) => (
             <div key={index} className="min-w-full h-60 sm:h-80 md:h-90 relative">
-           <img 
-             src={imgUrl} 
-             alt={`Banner ${index + 1}`} 
-             className="w-full h-full object-contain bg-slate-900"
+              <img 
+                src={imgUrl} 
+                alt={`Banner ${index + 1}`} 
+                className="w-full h-full object-cover"
               />
             </div>
           ))}
