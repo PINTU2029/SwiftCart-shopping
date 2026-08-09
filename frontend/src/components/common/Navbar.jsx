@@ -21,7 +21,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-linear-to-r from-slate-950 via-slate-900 to-indigo-950 text-white sticky top-0 z-50 shadow-lg border-b border-slate-800/80 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
+         <div className="w-[90%] mx-auto py-2.5 flex items-center justify-between gap-4">              
         
         {/* --- CIRCULAR LOGO CONTAINER --- */}
         <Link to="/" className="flex items-center gap-3 group">
