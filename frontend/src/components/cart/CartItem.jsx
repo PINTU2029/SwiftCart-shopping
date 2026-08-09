@@ -5,20 +5,50 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
   if (!product) return null;
 
+  // Image Fallback Handling (Single 'image' or 'images' array)
+  const productImage = product.image || (product.images && product.images[0]) || 'https://via.placeholder.com/100';
+
+  // MRP & Offer Calculation
+  const mrp = product.mrp || product.originalPrice || Math.round(product.price * 1.25);
+  const savings = mrp > product.price ? (mrp - product.price) : 0;
+  const discountPercent = mrp > product.price ? Math.round(((mrp - product.price) / mrp) * 100) : 0;
+
   return (
     <div className="flex items-center justify-between border-b border-slate-200 py-4 gap-4">
       <div className="flex items-center gap-4">
+        {/* Product Image */}
         <img
-          src={product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/100'}
-          alt={product.title}
-          className="w-20 h-20 object-cover rounded-lg border border-slate-100"
+          src={productImage}
+          alt={product.title || product.name}
+          className="w-20 h-20 object-cover rounded-xl border border-slate-100 shadow-xs"
         />
         <div>
           <h3 className="font-semibold text-slate-800 text-sm sm:text-base line-clamp-1">
-            {product.title}
+            {product.title || product.name}
           </h3>
-          <p className="text-xs text-indigo-600 font-medium">{product.category}</p>
-          <p className="text-slate-900 font-bold mt-1">₹{product.price}</p>
+          <p className="text-xs text-indigo-600 font-medium mb-1">{product.category}</p>
+
+          {/* 🏷️ OFFER PRICE BREAKDOWN */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Selling Price */}
+            <span className="text-slate-900 font-bold text-base">
+              ₹{product.price}
+            </span>
+
+            {/* MRP Strikethrough Price */}
+            {mrp > product.price && (
+              <span className="text-xs text-slate-400 line-through font-medium">
+                ₹{mrp}
+              </span>
+            )}
+
+            {/* Green Discount Offer Badge */}
+            {savings > 0 && (
+              <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                {discountPercent}% OFF
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
@@ -40,10 +70,17 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
           </button>
         </div>
 
-        {/* Total Price */}
-        <span className="font-bold text-slate-900 w-20 text-right hidden sm:block">
-          ₹{product.price * quantity}
-        </span>
+        {/* Total Price for Item Quantity */}
+        <div className="text-right hidden sm:block w-24">
+          <span className="font-bold text-slate-900 block">
+            ₹{product.price * quantity}
+          </span>
+          {savings > 0 && (
+            <span className="text-[10px] text-emerald-600 font-semibold block">
+              Save ₹{savings * quantity}
+            </span>
+          )}
+        </div>
 
         {/* Delete Button */}
         <button
