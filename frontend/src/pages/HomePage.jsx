@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import API from "../services/api";
 import ProductCard from '../components/product/ProductCard';
 import Loader from '../components/common/Loader';
@@ -39,6 +39,15 @@ const HomePage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const search = searchParams.get('search') || '';
+
+  // Horizontal Slider Ref for Arrows
+  const sliderRef = useRef(null);
+
+  const handleScroll = (scrollOffset) => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({ left: scrollOffset, behavior: 'smooth' });
+    }
+  };
 
   // Fetch Banners & Categories from Backend
   useEffect(() => {
@@ -207,6 +216,70 @@ const HomePage = () => {
           </div>
         )}
       </div>
+
+      {/* 4. Horizontal Arrow Slider Carousel (Grid aur Bottom ke Beech) */}
+      {!loading && products.length > 0 && (
+        <div className="w-[90%] mx-auto bg-white p-6 rounded-2xl shadow-md border border-slate-200 relative group">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-slate-800">
+              Recommended Deals & Quick Order
+            </h2>
+            <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+              Swipe to explore
+            </span>
+          </div>
+
+          {/* Left Arrow Button */}
+          <button 
+            onClick={() => handleScroll(-280)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            ❮
+          </button>
+
+          {/* Scrollable Container */}
+          <div 
+            ref={sliderRef}
+            className="flex items-center gap-5 overflow-x-auto scroll-smooth py-2 px-1"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {products.map((item) => (
+              <Link 
+                key={item._id} 
+                to={`/product/${item._id}`} 
+                className="min-w-[190px] max-w-[190px] bg-slate-50/80 p-3 rounded-xl border border-slate-200/80 hover:shadow-lg hover:bg-white hover:border-indigo-300 transition duration-300 flex flex-col items-center group/card"
+              >
+                <div className="w-32 h-32 bg-white rounded-lg p-2 flex items-center justify-center overflow-hidden border border-slate-100 shadow-xs">
+                  <img 
+                    src={item.image || item.images?.[0]} 
+                    alt={item.name || item.title} 
+                    className="max-h-full max-w-full object-contain group-hover/card:scale-105 transition duration-300"
+                  />
+                </div>
+                <div className="mt-3 text-center w-full">
+                  <p className="text-xs font-bold text-slate-800 truncate">
+                    {item.name || item.title}
+                  </p>
+                  <p className="text-xs font-extrabold text-indigo-600 mt-1">
+                    ₹{item.price}
+                  </p>
+                  <button className="mt-2 w-full bg-indigo-600 text-white text-[11px] font-bold py-1.5 rounded-lg hover:bg-indigo-500 transition shadow-xs">
+                    View & Order
+                  </button>
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Right Arrow Button */}
+          <button 
+            onClick={() => handleScroll(280)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            ❯
+          </button>
+        </div>
+      )}
 
     </div>
   );
