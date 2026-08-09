@@ -224,7 +224,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. CIRCLE SLIDER (ProductCard bilkul 100% identical pricing logic) */}
+      {/* 4. CIRCLE SLIDER (Guaranteed Exact Same Price as ProductCard) */}
       {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto py-6 relative group">
           
@@ -243,12 +243,16 @@ const HomePage = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {carouselProducts.map((item) => {
-              // 🔴 ProductCard jaisa exact logic:
               const title = item.title || item.name;
               const image = item.image || (item.images && item.images[0]);
-              const price = item.price;
-              const mrp = item.mrp || item.originalPrice;
-              const savings = mrp && mrp > price ? mrp - price : 0;
+              
+              // 🔴 EXACT MATCH LOGIC FOR PRODUCT CARD PRICE & MRP:
+              // Checking discountPrice / price / sellingPrice vs originalPrice / mrp
+              const sellingPrice = item.discountPrice || item.price || item.sellingPrice;
+              const mrp = item.originalPrice || item.mrp;
+              
+              // Only calculate savings if valid MRP exists and is higher than Selling Price
+              const savings = (mrp && Number(mrp) > Number(sellingPrice)) ? (Number(mrp) - Number(sellingPrice)) : 0;
 
               return (
                 <Link 
@@ -264,7 +268,7 @@ const HomePage = () => {
                       className="w-full h-full object-cover rounded-full"
                     />
 
-                    {/* 🏷️ Save ₹X Offer Badge (ProductCard ki tarah Exact Green Badge) */}
+                    {/* 🏷️ Save ₹X Offer Badge (ProductCard wala same badge) */}
                     {savings > 0 && (
                       <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-bold px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
                         Save ₹{savings}
@@ -277,12 +281,12 @@ const HomePage = () => {
                     {title}
                   </p>
                   
-                  {/* Price & Strikethrough MRP (Exact ProductCard style) */}
+                  {/* Price & Strikethrough MRP (ProductCard ke saath 100% matched) */}
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-xs sm:text-sm font-extrabold text-slate-900">
-                      ₹{price}
+                      ₹{sellingPrice}
                     </span>
-                    {mrp && mrp > price && (
+                    {savings > 0 && (
                       <span className="text-[11px] text-slate-400 line-through font-medium">
                         ₹{mrp}
                       </span>
