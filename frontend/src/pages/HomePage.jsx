@@ -28,10 +28,11 @@ const DEFAULT_BANNERS = [
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
+  const [carouselProducts, setCarouselProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');
   
-  // Banners & Categories State with Defaults
+  // Banners & Categories State
   const [categoryData, setCategoryData] = useState(DEFAULT_CATEGORIES);
   const [bannerImages, setBannerImages] = useState(DEFAULT_BANNERS);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -40,7 +41,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const search = searchParams.get('search') || '';
 
-  // Horizontal Slider Ref for Arrows
+  // Slider Ref
   const sliderRef = useRef(null);
 
   const handleScroll = (scrollOffset) => {
@@ -49,7 +50,7 @@ const HomePage = () => {
     }
   };
 
-  // Fetch Banners & Categories from Backend
+  // Fetch Banners & Categories
   useEffect(() => {
     const fetchHomeContent = async () => {
       try {
@@ -76,7 +77,7 @@ const HomePage = () => {
     fetchHomeContent();
   }, []);
 
-  // Auto-slide Timer (1 Second)
+  // Auto-slide Timer
   useEffect(() => {
     if (bannerImages.length === 0) return;
     const slideInterval = setInterval(() => {
@@ -95,6 +96,7 @@ const HomePage = () => {
     }
   };
 
+  // Fetch Products & Prepare Carousel Data
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -109,6 +111,12 @@ const HomePage = () => {
 
         const { data } = await API.get(url);
         setProducts(data);
+
+        // Shuffle Array to pick different products for Carousel
+        if (data && data.length > 0) {
+          const shuffled = [...data].sort(() => 0.5 - Math.random());
+          setCarouselProducts(shuffled);
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -180,7 +188,7 @@ const HomePage = () => {
           ))}
         </div>
 
-        {/* Banner Navigation Dots */}
+        {/* Navigation Dots */}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2 bg-black/20 px-3 py-1 rounded-full backdrop-blur-xs">
           {bannerImages.map((_, index) => (
             <button
@@ -194,7 +202,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      {/* 3. Products Section (90% Width) */}
+      {/* 3. Main Products Grid Section (90% Width) */}
       <div className="w-[90%] mx-auto">
         <h2 className="text-2xl font-bold text-slate-800 mb-6">
           {search 
@@ -217,55 +225,61 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. Horizontal Arrow Slider Carousel (Grid aur Bottom ke Beech) */}
-      {!loading && products.length > 0 && (
+      {/* 4. CIRCULAR PRODUCT SLIDER CAROUSEL (Grid aur Bottom ke Beech) */}
+      {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto bg-white p-6 rounded-2xl shadow-md border border-slate-200 relative group">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-slate-800">
-              Recommended Deals & Quick Order
-            </h2>
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900 tracking-wide">
+                Best Deals & Top Picks
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">Explore deals uploaded from admin store</p>
+            </div>
             <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
-              Swipe to explore
+              Swipe to view ➔
             </span>
           </div>
 
           {/* Left Arrow Button */}
           <button 
-            onClick={() => handleScroll(-280)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            onClick={() => handleScroll(-300)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           >
             ❮
           </button>
 
-          {/* Scrollable Container */}
+          {/* Scrollable Circular Items Container */}
           <div 
             ref={sliderRef}
-            className="flex items-center gap-5 overflow-x-auto scroll-smooth py-2 px-1"
+            className="flex items-center gap-6 overflow-x-auto scroll-smooth py-2 px-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {products.map((item) => (
+            {carouselProducts.map((item) => (
               <Link 
                 key={item._id} 
                 to={`/product/${item._id}`} 
-                className="min-w-[190px] max-w-[190px] bg-slate-50/80 p-3 rounded-xl border border-slate-200/80 hover:shadow-lg hover:bg-white hover:border-indigo-300 transition duration-300 flex flex-col items-center group/card"
+                className="min-w-[150px] max-w-[150px] flex flex-col items-center group/circle cursor-pointer"
               >
-                <div className="w-32 h-32 bg-white rounded-lg p-2 flex items-center justify-center overflow-hidden border border-slate-100 shadow-xs">
+                {/* 🔴 CIRCULAR IMAGE CONTAINER */}
+                <div className="w-32 h-32 rounded-full p-1.5 border-2 border-indigo-100 group-hover/circle:border-indigo-600 bg-white shadow-sm group-hover/circle:shadow-md group-hover/circle:scale-105 transition-all duration-300 flex items-center justify-center overflow-hidden">
                   <img 
                     src={item.image || item.images?.[0]} 
                     alt={item.name || item.title} 
-                    className="max-h-full max-w-full object-contain group-hover/card:scale-105 transition duration-300"
+                    className="w-full h-full object-cover rounded-full"
                   />
                 </div>
+
+                {/* Product Name & Offer Text */}
                 <div className="mt-3 text-center w-full">
-                  <p className="text-xs font-bold text-slate-800 truncate">
+                  <p className="text-xs font-bold text-slate-800 truncate px-1 group-hover/circle:text-indigo-600 transition">
                     {item.name || item.title}
                   </p>
                   <p className="text-xs font-extrabold text-indigo-600 mt-1">
                     ₹{item.price}
                   </p>
-                  <button className="mt-2 w-full bg-indigo-600 text-white text-[11px] font-bold py-1.5 rounded-lg hover:bg-indigo-500 transition shadow-xs">
-                    View & Order
-                  </button>
+                  <span className="inline-block mt-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Order Now
+                  </span>
                 </div>
               </Link>
             ))}
@@ -273,8 +287,8 @@ const HomePage = () => {
 
           {/* Right Arrow Button */}
           <button 
-            onClick={() => handleScroll(280)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            onClick={() => handleScroll(300)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white text-slate-800 w-10 h-10 rounded-full shadow-lg border border-slate-300 flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           >
             ❯
           </button>
