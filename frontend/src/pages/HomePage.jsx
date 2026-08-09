@@ -20,7 +20,7 @@ const DEFAULT_CATEGORIES = [
 
 // Default Fallback Banners
 const DEFAULT_BANNERS = [
-  "https://share.google/rS0fp7pet4LjzuoMZ",
+  "https://unsplash.com/photos/a-laptop-computer-sitting-on-top-of-a-desk-py8tNyHwWDg",
   "https://images.unsplash.com/photo-1607082349566-187342175e2f?q=80&w=1200&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1526178613552-2b45c6c302f0?q=80&w=1200&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1200&auto=format&fit=crop"
