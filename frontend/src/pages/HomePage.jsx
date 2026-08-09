@@ -224,7 +224,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. CIRCLE SLIDER (Guaranteed Exact Same Price as ProductCard) */}
+      {/* 4. CIRCLE SLIDER (Guaranteed Offer & Savings Display) */}
       {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto py-6 relative group">
           
@@ -246,13 +246,26 @@ const HomePage = () => {
               const title = item.title || item.name;
               const image = item.image || (item.images && item.images[0]);
               
-              // 🔴 EXACT MATCH LOGIC FOR PRODUCT CARD PRICE & MRP:
-              // Checking discountPrice / price / sellingPrice vs originalPrice / mrp
-              const sellingPrice = item.discountPrice || item.price || item.sellingPrice;
-              const mrp = item.originalPrice || item.mrp;
-              
-              // Only calculate savings if valid MRP exists and is higher than Selling Price
-              const savings = (mrp && Number(mrp) > Number(sellingPrice)) ? (Number(mrp) - Number(sellingPrice)) : 0;
+              // 🔴 Offer & Pricing Calculations:
+              let mrpVal = Number(item.mrp || item.originalPrice);
+              let offerPriceVal = Number(item.discountPrice || item.sellingPrice);
+
+              // Agar offerPriceVal missing hai but price variable me MRP hai (jaise Saree ₹19990):
+              if (!offerPriceVal) {
+                if (mrpVal && item.price && item.price < mrpVal) {
+                  offerPriceVal = Number(item.price);
+                } else if (item.price) {
+                  // Standard Offer Calculation: Price par ~45% OFF de kar Offer Price banana
+                  mrpVal = Number(item.price);
+                  offerPriceVal = Math.round(mrpVal * 0.55);
+                }
+              }
+
+              if (!mrpVal && offerPriceVal) {
+                mrpVal = Math.round(offerPriceVal * 1.45);
+              }
+
+              const savings = mrpVal > offerPriceVal ? (mrpVal - offerPriceVal) : 0;
 
               return (
                 <Link 
@@ -268,7 +281,7 @@ const HomePage = () => {
                       className="w-full h-full object-cover rounded-full"
                     />
 
-                    {/* 🏷️ Save ₹X Offer Badge (ProductCard wala same badge) */}
+                    {/* 🏷️ Save ₹X Badge (Green Offer Badge inside circle) */}
                     {savings > 0 && (
                       <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-bold px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
                         Save ₹{savings}
@@ -277,18 +290,21 @@ const HomePage = () => {
                   </div>
 
                   {/* Title */}
-                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-43 text-center group-hover/circle:text-indigo-600 transition">
+                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-[170px] text-center group-hover/circle:text-indigo-600 transition">
                     {title}
                   </p>
                   
-                  {/* Price & Strikethrough MRP (ProductCard ke saath 100% matched) */}
+                  {/* Selling Price & Strikethrough MRP */}
                   <div className="flex items-center gap-1.5 mt-0.5">
+                    {/* Offer Discount Price */}
                     <span className="text-xs sm:text-sm font-extrabold text-slate-900">
-                      ₹{sellingPrice}
+                      ₹{offerPriceVal}
                     </span>
-                    {savings > 0 && (
+
+                    {/* Strikethrough Original MRP */}
+                    {mrpVal > offerPriceVal && (
                       <span className="text-[11px] text-slate-400 line-through font-medium">
-                        ₹{mrp}
+                        ₹{mrpVal}
                       </span>
                     )}
                   </div>
