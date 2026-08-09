@@ -14,7 +14,7 @@ const DEFAULT_CATEGORIES = [
   { name: 'Accessories', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=200&auto=format&fit=crop' },
   { name: 'Beauty', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=200&auto=format&fit=crop' },
   { name: 'Groceries', image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=200&auto=format&fit=crop' },
-  { name: 'Sports', image: 'https://images.unsplash.com/photo-1517649763962-0c623266010b?q=80&w=200&auto=format&fit=crop' },
+  { name: 'Sports', image: 'https://unsplash.com/photos/sneakers-on-display-stands-under-warm-focused-lighting-DXTT02-ee-8' },
   { name: 'Toys & Kids', image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=200&auto=format&fit=crop' }
 ];
 
