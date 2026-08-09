@@ -96,7 +96,7 @@ const HomePage = () => {
     }
   };
 
-  // Fetch Products & Prepare Different Products for Carousel
+  // Fetch Products & Prepare Carousel
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -112,7 +112,6 @@ const HomePage = () => {
         const { data } = await API.get(url);
         setProducts(data);
 
-        // Different products select karne ke liye array reverse kar rhe hain
         if (data && data.length > 0) {
           const differentProducts = [...data].reverse();
           setCarouselProducts(differentProducts);
@@ -225,7 +224,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. PERFECT ROUND CIRCLE SLIDER (Clean Price Logic - No Multiplication) */}
+      {/* 4. CIRCLE SLIDER (ProductCard bilkul 100% identical pricing logic) */}
       {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto py-6 relative group">
           
@@ -244,10 +243,12 @@ const HomePage = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {carouselProducts.map((item) => {
-              // 🔴 FIX: Direct Database Price & MRP values use kiye hain
-              const sellingPrice = item.price;
+              // 🔴 ProductCard jaisa exact logic:
+              const title = item.title || item.name;
+              const image = item.image || (item.images && item.images[0]);
+              const price = item.price;
               const mrp = item.mrp || item.originalPrice;
-              const savings = mrp && mrp > sellingPrice ? mrp - sellingPrice : 0;
+              const savings = mrp && mrp > price ? mrp - price : 0;
 
               return (
                 <Link 
@@ -255,32 +256,33 @@ const HomePage = () => {
                   to={`/product/${item._id}`} 
                   className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
                 >
-                  {/* PERFECT CIRCULAR CONTAINER */}
+                  {/* PERFECT CIRCULAR IMAGE */}
                   <div className="relative w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 aspect-square rounded-full overflow-hidden shadow-md group-hover/circle:scale-105 transition duration-300 bg-slate-50 border border-slate-100">
                     <img 
-                      src={item.image || (item.images && item.images[0])} 
-                      alt={item.name || item.title} 
+                      src={image} 
+                      alt={title} 
                       className="w-full h-full object-cover rounded-full"
                     />
 
-                    {/* 🏷️ OFFER BADGE (Same as original cards) */}
+                    {/* 🏷️ Save ₹X Offer Badge (ProductCard ki tarah Exact Green Badge) */}
                     {savings > 0 && (
-                      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-black px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
+                      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-bold px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
                         Save ₹{savings}
                       </span>
                     )}
                   </div>
 
-                  {/* Title & Pricing */}
+                  {/* Title */}
                   <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-43 text-center group-hover/circle:text-indigo-600 transition">
-                    {item.name || item.title}
+                    {title}
                   </p>
                   
+                  {/* Price & Strikethrough MRP (Exact ProductCard style) */}
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-xs sm:text-sm font-extrabold text-slate-900">
-                      ₹{sellingPrice}
+                      ₹{price}
                     </span>
-                    {mrp && mrp > sellingPrice && (
+                    {mrp && mrp > price && (
                       <span className="text-[11px] text-slate-400 line-through font-medium">
                         ₹{mrp}
                       </span>
