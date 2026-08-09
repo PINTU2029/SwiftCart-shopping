@@ -225,7 +225,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. EXACT 5 CIRCLES SLIDER (Bigger Circle Size w-44 h-44) */}
+      {/* 4. PERFECT ROUND CIRCLE SLIDER (Equal 44/52/56 dimensions) */}
       {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto py-6 relative group">
           
@@ -255,24 +255,24 @@ const HomePage = () => {
                   to={`/product/${item._id}`} 
                   className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
                 >
-                  {/* BIGGER CIRCULAR IMAGE CONTAINER FOR EXACT 5 ITEMS PER SCREEN (w-32 h-32 to w-44 h-44) */}
-                  <div className="relative w-42 h-42 sm:w-40 sm:h-55 lg:w-55 lg:h-50">
+                  {/* PERFECT CIRCULAR CONTAINER (Equal Width & Height + aspect-square) */}
+                  <div className="relative w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 aspect-square rounded-full overflow-hidden shadow-md group-hover/circle:scale-105 transition duration-300 bg-slate-50 border border-slate-100">
                     <img 
                       src={item.image || item.images?.[0]} 
                       alt={item.name || item.title} 
-                      className="w-full h-full object-cover rounded-full shadow-md group-hover/circle:scale-105 transition duration-300"
+                      className="w-full h-full object-cover rounded-full"
                     />
 
-                    {/* 🏷️ OFFER BADGE */}
+                    {/* 🏷️ OFFER BADGE (Inside Circle at Bottom) */}
                     {(savings > 0 || discountPercent > 0) && (
-                      <span className="absolute bottom-1 right-2 bg-emerald-600 text-white text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full shadow-md border-2 border-white">
+                      <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-black px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
                         {savings > 0 ? `Save ₹${savings}` : `${discountPercent}% OFF`}
                       </span>
                     )}
                   </div>
 
                   {/* Title & Pricing */}
-                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-53 text-center group-hover/circle:text-indigo-600 transition">
+                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-43 text-center group-hover/circle:text-indigo-600 transition">
                     {item.name || item.title}
                   </p>
                   
