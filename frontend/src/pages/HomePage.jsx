@@ -225,7 +225,7 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. PERFECT ROUND CIRCLE SLIDER (Equal 44/52/56 dimensions) */}
+      {/* 4. PERFECT ROUND CIRCLE SLIDER (Clean Price Logic - No Multiplication) */}
       {!loading && carouselProducts.length > 0 && (
         <div className="w-[90%] mx-auto py-6 relative group">
           
@@ -244,10 +244,10 @@ const HomePage = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {carouselProducts.map((item) => {
-              // Offer Calculation
-              const mrp = item.mrp || item.originalPrice || (item.price ? Math.round(item.price * 1.25) : 0);
-              const savings = mrp > item.price ? mrp - item.price : 0;
-              const discountPercent = mrp > item.price ? Math.round(((mrp - item.price) / mrp) * 100) : 0;
+              // 🔴 FIX: Direct Database Price & MRP values use kiye hain
+              const sellingPrice = item.price;
+              const mrp = item.mrp || item.originalPrice;
+              const savings = mrp && mrp > sellingPrice ? mrp - sellingPrice : 0;
 
               return (
                 <Link 
@@ -255,18 +255,18 @@ const HomePage = () => {
                   to={`/product/${item._id}`} 
                   className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
                 >
-                  {/* PERFECT CIRCULAR CONTAINER (Equal Width & Height + aspect-square) */}
+                  {/* PERFECT CIRCULAR CONTAINER */}
                   <div className="relative w-44 h-44 sm:w-52 sm:h-52 lg:w-56 lg:h-56 aspect-square rounded-full overflow-hidden shadow-md group-hover/circle:scale-105 transition duration-300 bg-slate-50 border border-slate-100">
                     <img 
-                      src={item.image || item.images?.[0]} 
+                      src={item.image || (item.images && item.images[0])} 
                       alt={item.name || item.title} 
                       className="w-full h-full object-cover rounded-full"
                     />
 
-                    {/* 🏷️ OFFER BADGE (Inside Circle at Bottom) */}
-                    {(savings > 0 || discountPercent > 0) && (
+                    {/* 🏷️ OFFER BADGE (Same as original cards) */}
+                    {savings > 0 && (
                       <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[10px] sm:text-xs font-black px-3 py-0.5 rounded-full shadow-md border border-white whitespace-nowrap z-10">
-                        {savings > 0 ? `Save ₹${savings}` : `${discountPercent}% OFF`}
+                        Save ₹{savings}
                       </span>
                     )}
                   </div>
@@ -278,9 +278,9 @@ const HomePage = () => {
                   
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="text-xs sm:text-sm font-extrabold text-slate-900">
-                      ₹{item.price}
+                      ₹{sellingPrice}
                     </span>
-                    {mrp > item.price && (
+                    {mrp && mrp > sellingPrice && (
                       <span className="text-[11px] text-slate-400 line-through font-medium">
                         ₹{mrp}
                       </span>
