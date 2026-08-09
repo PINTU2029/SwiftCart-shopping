@@ -13,10 +13,25 @@ const CartPage = () => {
     fetchCart();
   }, []);
 
-  const subtotal = cartItems.reduce(
-    (acc, item) => acc + (item.product ? item.product.price * item.quantity : 0),
-    0
-  );
+  // 1. MRP Total (Bina Discount ka Total Price)
+  const mrpSubtotal = cartItems.reduce((acc, item) => {
+    if (!item.product) return acc;
+    const p = item.product;
+    const mrp = p.mrp || p.originalPrice || Math.round(p.price * 1.25);
+    return acc + mrp * item.quantity;
+  }, 0);
+
+  // 2. Total Offer Discount (Bachat)
+  const totalDiscount = cartItems.reduce((acc, item) => {
+    if (!item.product) return acc;
+    const p = item.product;
+    const mrp = p.mrp || p.originalPrice || Math.round(p.price * 1.25);
+    const savings = mrp > p.price ? (mrp - p.price) * item.quantity : 0;
+    return acc + savings;
+  }, 0);
+
+  // 3. Final Selling Subtotal (MRP - Discount)
+  const finalSubtotal = mrpSubtotal - totalDiscount;
 
   if (loading) return <Loader />;
 
@@ -44,7 +59,13 @@ const CartPage = () => {
             ))}
           </div>
           <div>
-            <CartSummary subtotal={subtotal} onCheckout={() => navigate('/checkout')} />
+            {/* Extended Props Pass Kiye Gaye Hain */}
+            <CartSummary 
+              mrpSubtotal={mrpSubtotal}
+              totalDiscount={totalDiscount}
+              subtotal={finalSubtotal} 
+              onCheckout={() => navigate('/checkout')} 
+            />
           </div>
         </div>
       )}
