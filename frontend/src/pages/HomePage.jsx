@@ -20,10 +20,10 @@ const DEFAULT_CATEGORIES = [
 
 // Default Fallback Banners
 const DEFAULT_BANNERS = [
-  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1400&h=300&auto=format&fit=crop&crop=entropy",
-  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1400&h=300&auto=format&fit=crop&crop=entropy",
-  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1400&h=300&auto=format&fit=crop&crop=entropy",
-  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1400&h=300&auto=format&fit=crop&crop=entropy"
+  "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=1400&h=300&auto=format&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1400&h=300&auto=format&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1556911261-6bd341186b2f?q=80&w=1400&h=300&auto=format&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?q=80&w=1400&h=300&auto=format&fit=crop&crop=center"
 ];
 
 const HomePage = () => {
