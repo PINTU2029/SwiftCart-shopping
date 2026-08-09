@@ -43,20 +43,20 @@ const ProductDetailPage = () => {
     fetchProduct();
   }, [id]);
 
-  // Normal Add to Cart (Navigates to Cart)
+  // Normal Add to Cart
   const handleAddToCart = async () => {
     await addToCart(product._id, qty);
     toast.success('Added to Cart!');
     navigate('/cart');
   };
 
-  // Direct Buy Now (Navigates directly to Checkout)
+  // Direct Buy Now
   const handleBuyNow = async () => {
     await addToCart(product._id, qty);
     navigate('/checkout');
   };
 
-  // Submit New Review
+  // Submit Review
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!comment.trim()) {
@@ -81,7 +81,7 @@ const ProductDetailPage = () => {
     }
   };
 
-  // Delete Review Handler
+  // Delete Review
   const handleDeleteReview = async (reviewId) => {
     if (window.confirm('Kya aap is review ko delete karna chahte hain?')) {
       try {
@@ -101,7 +101,7 @@ const ProductDetailPage = () => {
     setEditComment(rev.comment);
   };
 
-  // Update Review Handler
+  // Update Review
   const handleUpdateReview = async (reviewId) => {
     if (!editComment.trim()) {
       return toast.error('Comment cannot be empty.');
@@ -124,12 +124,25 @@ const ProductDetailPage = () => {
   if (loading) return <Loader />;
   if (!product) return <div className="text-center py-12">Product not found.</div>;
 
+  // Exact Admin Discount Value
+  const discountPercent = Number(product.discount) || 0;
+  const originalPrice = Number(product.price) || 0;
+  const discountedPrice = discountPercent > 0
+    ? Math.round(originalPrice - (originalPrice * discountPercent) / 100)
+    : originalPrice;
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 space-y-12">
       {/* Product Image & Info Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-white p-6 sm:p-10 rounded-2xl shadow-sm border border-slate-100">
-        {/* Product Image */}
-        <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-200">
+        
+        {/* Product Image Container */}
+        <div className="rounded-xl overflow-hidden bg-slate-50 border border-slate-200 relative">
+          {discountPercent > 0 && (
+            <span className="absolute top-4 left-4 bg-red-600 text-white text-xs font-extrabold px-3 py-1 rounded-md z-10 shadow-md">
+              {discountPercent}% OFF
+            </span>
+          )}
           <img
             src={product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/500'}
             alt={product.title}
@@ -148,8 +161,29 @@ const ProductDetailPage = () => {
               value={product.rating || product.ratings || 0}
               text={`${product.numReviews || product.numOfReviews || 0} customer reviews`}
             />
-            <p className="text-3xl font-extrabold text-slate-900">₹{product.price}</p>
-            <p className="text-slate-600 text-sm leading-relaxed">{product.description}</p>
+
+            {/* Price & Offer Display Section */}
+            <div className="pt-2">
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-extrabold text-slate-900">
+                  ₹{discountedPrice}
+                </span>
+
+                {discountPercent > 0 && (
+                  <span className="text-lg text-slate-400 line-through font-medium">
+                    ₹{originalPrice}
+                  </span>
+                )}
+              </div>
+
+              {discountPercent > 0 && (
+                <span className="text-xs text-green-600 font-bold mt-1 inline-block bg-green-50 px-2 py-0.5 rounded">
+                  You save ₹{originalPrice - discountedPrice} ({discountPercent}%)
+                </span>
+              )}
+            </div>
+
+            <p className="text-slate-600 text-sm leading-relaxed pt-2">{product.description}</p>
           </div>
 
           <div className="space-y-4 pt-4 border-t border-slate-100">
@@ -172,7 +206,7 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            {/* Action Buttons: Add To Cart + Buy Now */}
+            {/* Action Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <button
                 onClick={handleAddToCart}
@@ -192,14 +226,13 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
-      {/* --- CUSTOMER REVIEWS SECTION --- */}
+      {/* --- REVIEWS SECTION --- */}
       <div className="bg-white p-6 sm:p-10 rounded-2xl border border-slate-100 shadow-sm space-y-8">
         <h2 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-4">
           Customer Reviews & Ratings
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Write a Review Box */}
           <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl h-fit space-y-4">
             <h3 className="font-bold text-slate-800 text-base">Write a Customer Review</h3>
 
@@ -258,14 +291,13 @@ const ProductDetailPage = () => {
             )}
           </div>
 
-          {/* Reviews List Display */}
           <div className="space-y-4">
             <h3 className="font-bold text-slate-800 text-base mb-2">
               Reviews ({product.reviews?.length || 0})
             </h3>
 
             {product.reviews && product.reviews.length > 0 ? (
-              <div className="space-y-3 max-h-450px overflow-y-auto pr-1">
+              <div className="space-y-3 max-h-120 overflow-y-auto pr-1">
                 {product.reviews.map((rev) => {
                   const isOwner = user && (user._id === rev.user || user._id === rev.user?._id);
                   const isAdmin = user?.role === 'admin' || user?.isAdmin;

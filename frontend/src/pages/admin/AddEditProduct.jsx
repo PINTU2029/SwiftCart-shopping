@@ -5,7 +5,7 @@ import API from '../../services/api';
 import { toast } from 'react-hot-toast';
 
 const AddEditProduct = () => {
-  const { id } = useParams(); // ID check for Edit vs Add mode
+  const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
 
@@ -13,6 +13,7 @@ const AddEditProduct = () => {
     title: '',
     description: '',
     price: '',
+    discount: '', // Added Offer field (% Off / Tag)
     category: 'Electronics',
     stock: '',
   });
@@ -30,6 +31,7 @@ const AddEditProduct = () => {
             title: data.title || '',
             description: data.description || '',
             price: data.price || '',
+            discount: data.discount || '', // Set existing offer value
             category: data.category || 'Electronics',
             stock: data.stock || '',
           });
@@ -48,7 +50,7 @@ const AddEditProduct = () => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
-      setImagePreview(URL.createObjectURL(file)); // Direct preview from device
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -56,16 +58,16 @@ const AddEditProduct = () => {
     e.preventDefault();
     setLoading(true);
 
-    // FormData for direct file upload
     const dataToSend = new FormData();
     dataToSend.append('title', formData.title);
     dataToSend.append('description', formData.description);
     dataToSend.append('price', formData.price);
+    dataToSend.append('discount', formData.discount); // Send offer data to backend
     dataToSend.append('stock', formData.stock);
     dataToSend.append('category', formData.category);
 
     if (imageFile) {
-      dataToSend.append('image', imageFile); // Direct device image attachment
+      dataToSend.append('image', imageFile);
     }
 
     try {
@@ -119,7 +121,8 @@ const AddEditProduct = () => {
             ></textarea>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Price, Offer & Stock Fields */}
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Price (₹)</label>
               <input
@@ -130,6 +133,18 @@ const AddEditProduct = () => {
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
               />
             </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Offer / Discount (%)</label>
+              <input
+                type="number"
+                placeholder="e.g. 20"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                value={formData.discount}
+                onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+              />
+            </div>
+
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Stock Quantity</label>
               <input
@@ -154,10 +169,14 @@ const AddEditProduct = () => {
               <option value="Footwear">Footwear</option>
               <option value="Home & Kitchen">Home & Kitchen</option>
               <option value="Accessories">Accessories</option>
+              <option value="Beauty">Beauty</option>
+              <option value="Groceries">Groceries</option>
+              <option value="Sports">Sports</option>
+              <option value="Toys & Kids">Toys & Kids</option>
             </select>
           </div>
 
-          {/* Direct File Picker Section */}
+          {/* File Picker */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
               Select Product Image (From Device)

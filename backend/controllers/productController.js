@@ -33,11 +33,11 @@ const getProductById = async (req, res) => {
   }
 };
 
-// @desc    Create a Product (Admin Only - Supports File Upload)
+// @desc    Create a Product (Admin Only - Supports File Upload & Discount)
 // @route   POST /api/v1/products
 const createProduct = async (req, res) => {
   try {
-    const { title, description, price, category, stock } = req.body;
+    const { title, description, price, discount, category, stock } = req.body;
 
     let imageUrls = [];
 
@@ -66,6 +66,7 @@ const createProduct = async (req, res) => {
       title,
       description,
       price: Number(price),
+      discount: discount !== undefined ? Number(discount) : 0, // Catch & save discount
       category,
       stock: Number(stock),
       images: imageUrls,
@@ -78,17 +79,23 @@ const createProduct = async (req, res) => {
   }
 };
 
-// @desc    Update a Product (Admin Only - Supports Image Update)
+// @desc    Update a Product (Admin Only - Supports Image & Discount Update)
 // @route   PUT /api/v1/products/:id
 const updateProduct = async (req, res) => {
   try {
-    const { title, description, price, category, stock } = req.body;
+    const { title, description, price, discount, category, stock } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (product) {
       product.title = title || product.title;
       product.description = description || product.description;
       product.price = price !== undefined ? Number(price) : product.price;
+      
+      // Update discount field explicitly
+      if (discount !== undefined) {
+        product.discount = Number(discount);
+      }
+
       product.category = category || product.category;
       product.stock = stock !== undefined ? Number(stock) : product.stock;
 
@@ -191,7 +198,6 @@ const updateProductReview = async (req, res) => {
         return res.status(404).json({ message: 'Review not found' });
       }
 
-      // Check if logged in user is the owner
       if (review.user.toString() !== req.user._id.toString()) {
         return res.status(403).json({ message: 'Not authorized to edit this review' });
       }
@@ -199,7 +205,6 @@ const updateProductReview = async (req, res) => {
       review.rating = rating !== undefined ? Number(rating) : review.rating;
       review.comment = comment || review.comment;
 
-      // Recalculate average rating
       product.rating =
         product.reviews.reduce((acc, item) => item.rating + acc, 0) /
         product.reviews.length;
@@ -232,7 +237,6 @@ const deleteProductReview = async (req, res) => {
 
       const review = product.reviews[reviewIndex];
 
-      // Allow if User owns the review OR User is Admin
       const isOwner = review.user.toString() === req.user._id.toString();
       const isAdmin = req.user.isAdmin || req.user.role === 'admin';
 
@@ -240,7 +244,6 @@ const deleteProductReview = async (req, res) => {
         product.reviews.splice(reviewIndex, 1);
         product.numReviews = product.reviews.length;
 
-        // Recalculate average rating
         product.rating =
           product.reviews.length > 0
             ? product.reviews.reduce((acc, item) => item.rating + acc, 0) /
