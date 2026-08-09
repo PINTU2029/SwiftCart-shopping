@@ -112,9 +112,8 @@ const HomePage = () => {
         const { data } = await API.get(url);
         setProducts(data);
 
-        // Grid ke products se DFFERENT products slider me laane ke liye
+        // Different products select karne ke liye array reverse kar rhe hain
         if (data && data.length > 0) {
-          // Slice or Reverse to select different set of products
           const differentProducts = [...data].reverse();
           setCarouselProducts(differentProducts);
         }
@@ -226,52 +225,76 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* 4. CLEAN CIRCULAR SLIDER (Bina kisi border/card outline ke - Only Round Image) */}
+      {/* 4. LARGE CIRCULAR SLIDER WITH OFFER BADGES */}
       {!loading && carouselProducts.length > 0 && (
-        <div className="w-[90%] mx-auto py-4 relative group">
+        <div className="w-[90%] mx-auto py-6 relative group">
           
           {/* Left Arrow Button */}
           <button 
-            onClick={() => handleScroll(-300)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-900 w-9 h-9 rounded-full shadow-md flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-slate-200"
+            onClick={() => handleScroll(-350)}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-slate-900 w-10 h-10 rounded-full shadow-lg flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-slate-200 cursor-pointer"
           >
             ❮
           </button>
 
-          {/* Scrollable Pure Circular Products Container */}
+          {/* Scrollable Container */}
           <div 
             ref={sliderRef}
-            className="flex items-center gap-6 sm:gap-8 overflow-x-auto scroll-smooth py-2 px-4"
+            className="flex items-center gap-8 sm:gap-10 overflow-x-auto scroll-smooth py-4 px-2"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {carouselProducts.map((item) => (
-              <Link 
-                key={item._id} 
-                to={`/product/${item._id}`} 
-                className="flex flex-col items-center shrink-0 group/circle cursor-pointer"
-              >
-                {/* 🔴 ONLY CIRCULAR IMAGE (Bina outer border / background border ke) */}
-                <img 
-                  src={item.image || item.images?.[0]} 
-                  alt={item.name || item.title} 
-                  className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 object-cover rounded-full group-hover/circle:scale-105 transition duration-300 shadow-sm"
-                />
+            {carouselProducts.map((item) => {
+              // Offer / Discount Calculation (Jaise main card me hota hai)
+              const mrp = item.mrp || item.originalPrice || (item.price ? Math.round(item.price * 1.25) : 0);
+              const savings = mrp > item.price ? mrp - item.price : 0;
+              const discountPercent = mrp > item.price ? Math.round(((mrp - item.price) / mrp) * 100) : 0;
 
-                {/* Title & Price */}
-                <p className="mt-2 text-xs font-semibold text-slate-700 truncate max-w-[100px] text-center group-hover/circle:text-indigo-600 transition">
-                  {item.name || item.title}
-                </p>
-                <p className="text-xs font-bold text-slate-900 mt-0.5">
-                  ₹{item.price}
-                </p>
-              </Link>
-            ))}
+              return (
+                <Link 
+                  key={item._id} 
+                  to={`/product/${item._id}`} 
+                  className="flex flex-col items-center shrink-0 group/circle cursor-pointer relative"
+                >
+                  {/* BIGGER CIRCULAR IMAGE CONTAINER (w-28 h-28 sm:w-36 sm:h-36) */}
+                  <div className="relative w-28 h-28 sm:w-36 sm:h-36">
+                    <img 
+                      src={item.image || item.images?.[0]} 
+                      alt={item.name || item.title} 
+                      className="w-full h-full object-cover rounded-full shadow-md group-hover/circle:scale-105 transition duration-300"
+                    />
+
+                    {/* 🏷️ OFFER BADGE ON CIRCLE (Main Card Jaisa) */}
+                    {(savings > 0 || discountPercent > 0) && (
+                      <span className="absolute bottom-1 right-1 bg-emerald-600 text-white text-[10px] sm:text-xs font-black px-2 py-0.5 rounded-full shadow-md border-2 border-white">
+                        {savings > 0 ? `Save ₹${savings}` : `${discountPercent}% OFF`}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Title & Pricing Details */}
+                  <p className="mt-3 text-xs sm:text-sm font-semibold text-slate-800 truncate max-w-[130px] text-center group-hover/circle:text-indigo-600 transition">
+                    {item.name || item.title}
+                  </p>
+                  
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-xs sm:text-sm font-extrabold text-slate-900">
+                      ₹{item.price}
+                    </span>
+                    {mrp > item.price && (
+                      <span className="text-[11px] text-slate-400 line-through font-medium">
+                        ₹{mrp}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Right Arrow Button */}
           <button 
-            onClick={() => handleScroll(300)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-slate-900 w-9 h-9 rounded-full shadow-md flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-slate-200"
+            onClick={() => handleScroll(350)}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-white/95 hover:bg-white text-slate-900 w-10 h-10 rounded-full shadow-lg flex items-center justify-center font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-slate-200 cursor-pointer"
           >
             ❯
           </button>
