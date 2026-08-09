@@ -162,10 +162,10 @@ const HomePage = () => {
         >
           {bannerImages.map((imgUrl, index) => (
             <div key={index} className="min-w-full h-60 sm:h-80 md:h-90 relative">
-              <img 
-                src={imgUrl} 
-                alt={`Banner ${index + 1}`} 
-                className="w-full h-full object-cover"
+           <img 
+             src={imgUrl} 
+             alt={`Banner ${index + 1}`} 
+             className="w-full h-full object-contain bg-slate-900"
               />
             </div>
           ))}
